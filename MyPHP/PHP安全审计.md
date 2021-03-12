@@ -613,9 +613,63 @@ if(isset($_POST['button'])){
 
 #### 自动加载类
 
+当缺少类的时候自动调用__autoload()函数
+
 ```php
 __autoload — 尝试加载未定义的类
+// 当
 // 7.2以后废弃
+```
+
+手动加载
+
+```php
+// Nba.php
+<?php
+abstract class Nba {
+    protected $player;
+    final public function setPlayer($player){
+        $this->player = $player;
+    }
+    public abstract function getplayer();
+}
+
+// Nets.php
+<?php
+class Nets extends Nba {
+    protected $player;
+    public function getPlayer()
+    {
+        echo $this->player."<br>";
+    }
+}
+
+// Rocket.php
+<?php
+class Rocket extends Nba {
+    protected $player;
+    public function getPlayer()
+    {
+        echo $this->player."<br>";
+    }
+}
+
+// test.php
+<?php
+require './Nba.php';  //手动加载类
+require './Nets.php';
+require './Rocket.php';
+
+$nets = new Nets;
+$nets->setPlayer("harden");
+$rocket = new Rocket;
+$rocket->setPlayer("house");
+$nets->getPlayer();
+$rocket->getPlayer();
+
+// 结果
+harden
+house
 ```
 
 
