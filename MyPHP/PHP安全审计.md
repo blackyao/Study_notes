@@ -613,12 +613,12 @@ if(isset($_POST['button'])){
 
 #### 自动加载类
 
-当缺少类的时候自动调用__autoload()函数
+当缺少类的时候自动调用`__autoload()`函数，并且将缺少的类名作为参数传递给`__autoload()`
 
 ```php
-__autoload — 尝试加载未定义的类
-// 当
-// 7.2以后废弃
+__autoload — 尝试加载未定义的类  // 7.2以后废弃
+
+spl_autoload_register()   // 5.1版本新增
 ```
 
 手动加载类
@@ -672,7 +672,45 @@ harden
 house
 ```
 
+自动加载类
 
+```php
+<?php
+// require './nba.php';  //手动加载类
+// require './nets.php';
+// require './rocket.php';
+
+// 自动加载类
+function __autoload($class_name) {
+    // require './'.$class_name.'.php';
+    require "./{$class_name}.php";
+}
+
+$nets = new Nets;
+$nets->setPlayer("harden");
+$rocket = new Rocket;
+$rocket->setPlayer("house");
+$nets->getPlayer();
+$rocket->getPlayer();
+```
+
+注册加载类
+
+```php
+// 注册加载类
+/// 方法一：
+// // 加载类函数
+function loadClass($class_name) {
+    require "./{$class_name}.php";
+}
+// // 注册加载类函数
+spl_autoload_register('loadClass');
+/// 方法二：
+//// 闭包在PHP5.3才引进
+spl_autoload_register(function($class_name){
+    require "./{$class_name}.php";
+});
+```
 
 #### 创建对象的方式
 
