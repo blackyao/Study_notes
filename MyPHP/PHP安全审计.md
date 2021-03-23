@@ -293,7 +293,7 @@ PHP 命名空间中的类名可以通过三种方式引用
   * 私有属性可以继承但不能被重写
 * 多态：多种形态，分为**方法重写和方法重载**
   * 方法重写：子类重写了父类的同名的方法
-  * 方法重载：同个类中
+  * 方法重载：同个类中不同参数类型或数量的同名方法
 
 1. **对象是由属性和方法组成的**
 2. **类是所有对象的相同属性和方法的集合**
@@ -316,7 +316,7 @@ var_dump($stu3 === $stu2); //全等
 //bool(true) bool(false) bool(true)
 ```
 
-#### 访问控制
+#### 访问控制修饰符
 
 > - public（公有）：公有的类成员可以在任何地方被访问。
 > - protected（受保护）：受保护的类成员则可以被其自身以及其子类和父类访问（继承链）。
@@ -489,7 +489,7 @@ $stu->getInfo();
 class Student {
     public const SSS='lll';
 }
-
+// 访问类常量
 echo Student::SSS;
 ```
 
@@ -738,9 +738,89 @@ var_dump($stu1, $stu2);
 
 特征：一个类只能有一个对象
 
+>三私一公：
+>
+>* **私有静态单例属性 标识此单例的在内存中唯一存在**
+>* **私有构造方法阻止类的实例化**
+>* **私有的__clone()来阻止在类的外部clone对象**
+>* **公有静态方法来实现这个实例**
 
+```php
+<?php
+//单例模式： 
+//一个类只能有一个对象
+class Student {
+    // 私有静态单例属性 标识此单例的在内存中永远存在
+    private static $instance;
+    // 私有构造方法阻止类的实例化
+    private function __construct()
+    {
+        
+    }
+    // 私有的__clone()来阻止在类的外部clone对象
+    private function __clone()
+    {
+        
+    }
+    // 因为需要一个对象且不能被直接实例化获得，因此使用静态方法来实现这一个实例
+    public static function getInstance() {
+        // 判断$instance的值是否属于Student类的类型，不属于就进行实例化返回，否则直接返回
+        if(!(self::$instance instanceof self))
+            self::$instance = new self();
+        return self::$instance;
+    }
 
-## php反序列化原理？
+}
+
+$stu1 = Student::getInstance();
+$stu2 = Student::getInstance();
+$stu3 = Student::getInstance();
+var_dump($stu1, $stu2, $stu3);
+```
+
+![image-20210323171029944](https://gitee.com/f4ke/MarkDownImg/raw/master/static/20210323171038.png)
+
+### 工厂模式
+
+特征：传递不同的参数，获取不同的对象
+
+```php
+<?php
+
+class productsA{
+
+}
+
+class productsB{
+
+}
+
+class productFactory{
+    public function getproduct($num){
+        switch ($num) {
+            case 1:
+                return new productsA;
+            case 2:
+                return new productsB;
+            default:
+                return null;
+        }
+    }
+}
+
+$factory = new productFactory();
+$pro1 = $factory->getproduct(1);
+$pro2 = $factory->getproduct(2);
+var_dump($pro1, $pro2);
+```
+
+![image-20210323173647727](https://gitee.com/f4ke/MarkDownImg/raw/master/static/20210323173648.png)
+
+### 策略模式
+
+特征：传递不同的参数执行不同的策略（方法）
+
+## php序列化
 
 主观理解：**序列化是为了方便对象的传递，节省资源，把对象序列化为一个字符串进行存储，需要用到的时候再反序列化为对象，序列化和反序列化的过程中会自带很多魔术方法，当某个魔术方法被用户输入可控时，就有可能存在反序列化漏洞**
 
