@@ -177,80 +177,49 @@ PHP 命名空间可以解决以下两类问题：
 
 命名空间通过关键字namespace 来声明，**命名空间必须是程序脚本的第一条语句**
 
-```
+```php
 <?php  
 // 定义代码在 'MyProject' 命名空间中  
 namespace MyProject;  
  
 // ... 代码 ...  
+const CONNECT_OK = 1;
+class Connection { /* ... */ }
+function Connect() { /* ... */  }
 ```
 
-可以在同一个文件中定义不同的命名空间代码
+#### 声明命名空间
 
-```
-<?php
-namespace MyProject {
-    const CONNECT_OK = 1;
-    class Connection { /* ... */ }
-    function connect() { /* ... */  }
-}
-
-namespace AnotherProject {
-    const CONNECT_OK = 1;
-    class Connection { /* ... */ }
-    function connect() { /* ... */  }
-}
-?>
-```
-
-将**全局的非命名空间**中的代码与**命名空间**中的代码组合在一起，只能使用大括号形式的语法。全局代码必须用一个不带名称的 namespace 语句加上大括号括起来
+注意：==\为公共空间==
 
 ```php
 <?php
-namespace MyProject {
+namespace Nets;  //声明命名空间
 
-const CONNECT_OK = 1;
-class Connection { /* ... */ }
-function connect() { /* ... */  }
+function getInfo()
+{
+    echo "i am a Nets player<br>";
 }
 
-namespace { // 全局代码
-session_start();
-$a = MyProject\connect();
-echo MyProject\Connection::start();
+namespace Rocket;
+
+function getInfo(){
+    echo "i am a Rocket player<br>";
 }
-?>
+// 调用
+getInfo();
+\Rocket\getInfo();
+\Nets\getInfo();
+
 ```
 
-在声明命名空间之前唯一合法的代码是用于定义源文件编码方式的 declare 语句。所有非 PHP 代码包括空白符都不能出现在命名空间的声明之前。
-
-```php
-<?php
-declare(encoding='UTF-8'); //定义多个命名空间和不包含在命名空间中的代码
-namespace MyProject {
-
-const CONNECT_OK = 1;
-class Connection { /* ... */ }
-function connect() { /* ... */  }
-}
-
-namespace { // 全局代码
-session_start();
-$a = MyProject\connect();
-echo MyProject\Connection::start();
-}
-?>
-```
-
-
+![image-20210325150205358](https://gitee.com/f4ke/MarkDownImg/raw/master/static/20210325150207.png)
 
 #### 子命名空间
 
+与目录和文件的关系很像，PHP 命名空间也允许指定层次化的命名空间的名称。因此，命名空间的名字可以使用分层次的方式定义：
 
-
-与目录和文件的关系很象，PHP 命名空间也允许指定层次化的命名空间的名称。因此，命名空间的名字可以使用分层次的方式定义：
-
-```
+```php
 <?php
 namespace MyProject\Sub\Level;  //声明分层次的单个命名空间
 
@@ -261,27 +230,68 @@ function Connect() { /* ... */  }
 ?>
 ```
 
-上面的例子创建了常量 MyProject\Sub\Level\CONNECT_OK，类 MyProject\Sub\Level\Connection 和函数 MyProject\Sub\Level\Connect。
-
-
+上面的例子创建了常量 MyProject\Sub\Level\CONNECT_OK，类 MyProject\Sub\Level\Connection 和函数 MyProject\Sub\Level\Connect
 
 #### 命名空间使用 
 
-
-
 PHP 命名空间中的类名可以通过三种方式引用
 
-- 非限定名称，或不包含前缀的类名称
+- ==非限定名称==，或不包含前缀的名称
 
-例如 $a=new foo(); 或 foo::staticmethod();。如果当前命名空间是 currentnamespace，foo 将被解析为 currentnamespace\foo。如果使用 foo 的代码是全局的，不包含在任何命名空间中的代码，则 foo 会被解析为foo。
+- ==限定名称==,或包含前缀的名称
 
-- 限定名称,或包含前缀的名称
+- ==完全限定名称==，或包含了全局前缀操作符的名称
 
-例如 $a = new subnamespace\foo(); 或 subnamespace\foo::staticmethod();。如果当前的命名空间是 currentnamespace，则 foo 会被解析为 currentnamespace\subnamespace\foo。如果使用 foo 的代码是全局的，不包含在任何命名空间中的代码，foo 会被解析为subnamespace\foo。
+```php
+<?php
+namespace USA\Rocket\Nets;
+function getInfo()
+{
+    echo "i am a Nets player<br>";
+}
 
-- 完全限定名称，或包含了全局前缀操作符的名称
+namespace USA\Rocket;
+function getInfo(){
+    echo "i am a Rocket player<br>";
+}
 
-例如， $a = new \currentnamespace\foo(); 或 \currentnamespace\foo::staticmethod();。在这种情况下，foo 总是被解析为代码中的文字名(literal name)currentnamespace\foo。
+getInfo();             // 非限定名称
+\USA\Rocket\getInfo(); // 完全限定名称
+Nets\getInfo();        // 限定名称
+```
+
+![image-20210325151321127](https://gitee.com/f4ke/MarkDownImg/raw/master/static/20210325151322.png)
+
+#### 命名空间的引入
+
+```php
+<?php
+namespace USA\Nets;
+function getInfo()
+{
+    echo "i am a Nets player<br>";
+}
+
+namespace USA\Rocket;
+function getInfo(){
+    echo "i am a Rocket player<br>";
+}
+// 引入命名空间
+use USA\Nets;
+
+getInfo();
+Nets\getInfo();  
+```
+
+![image-20210325152655222](https://gitee.com/f4ke/MarkDownImg/raw/master/static/20210325152656.png)
+
+重要：
+
+* ==命名空间只能存放类，函数，const常量==
+* ==namespace前不能有任何的代码，空白字符，包括header()==
+* ==包含文件不影响当前命名空间==
+
+
 
 ### 面向对象
 
@@ -820,30 +830,179 @@ var_dump($pro1, $pro2);
 
 特征：传递不同的参数执行不同的策略（方法）
 
-## php序列化
+## PHP序列化
+
+### 数组序列化和反序列化
+
+```php
+$palyer = ['harden', 'james', '077'];
+$str_palyer = serialize($palyer);
+file_put_contents('./palyer.txt', $str_palyer);
+//a:3:{i:0;s:6:"harden";i:1;s:5:"james";i:2;s:3:"077";}
+
+$str_palyer = file_get_contents('./palyer.txt');
+echo $str_palyer.'<br>';
+$palyer = unserialize($str_palyer);
+var_dump($palyer);
+//a:3:{i:0;s:6:"harden";i:1;s:5:"james";i:2;s:3:"077";}
+//array(3) { [0]=> string(6) "harden" [1]=> string(5) "james" [2]=> string(3) "077" }
+```
+
+### 对象序列化和反序列化
+
+```php
+class Nets {
+    public $name;
+    protected $age;
+    private $country;
+    public function __construct($name, $age, $country)
+    {
+        $this->name = $name;
+        $this->age = $age;
+        $this->country = $country;
+    }
+}
+// 对象序列化
+$harden = new Nets('harden', 31, 'USA');
+$str_harden = serialize($harden);
+// echo '<pre>';
+echo $str_harden;
+file_put_contents('./nets.txt', $harden);
+// O:4:"Nets":3:{s:4:"name";s:6:"harden";s:6:"*age";i:31;s:13:"Netscountry";s:3:"USA";}
+```
+
+```php
+class Nets {
+    public $name;
+    protected $age;
+    private $country;
+    public function __construct($name, $age, $country)
+    {
+        $this->name = $name;
+        $this->age = $age;
+        $this->country = $country;
+    }
+}
+// 将字符串反序列化为对象
+$str_harden = file_get_contents('./nets.txt');
+$harden = unserialize($str_harden);
+echo '<pre>';
+var_dump($harden);
+```
+
+![image-20210324111152413](https://gitee.com/f4ke/MarkDownImg/raw/master/static/20210324111200.png)
+
+需要注意，反序列化必须需要类的参与，不然无法确定是哪个类，反序列化结果如下
+
+![image-20210324111330537](https://gitee.com/f4ke/MarkDownImg/raw/master/static/20210324111331.png)
+
+![image-20210329164214504](PHP安全审计.assets/image-20210329164214504.png)
 
 主观理解：**序列化是为了方便对象的传递，节省资源，把对象序列化为一个字符串进行存储，需要用到的时候再反序列化为对象，序列化和反序列化的过程中会自带很多魔术方法，当某个魔术方法被用户输入可控时，就有可能存在反序列化漏洞**
 
 ### 常见魔术方法
 
+魔术方法都是计算机自动执行的方法
+
 ```php
 __construct()         //创建对象时触发
 __destruct()          //对象被销毁时触发
+    
 __wakeup()			//使用unserialize时触发，醒来
 __sleep()			//使用serialize时触发，睡去
-__toString()		//把类当作字符串使用时触发
+    
 __call()              //在对象上下文中调用不可访问的方法时触发
 __callStatic()        //在静态上下文中调用不可访问的方法时触发
-__get()               //用于从不可访问的属性读取数据
-__set()               //用于将数据写入不可访问的属性
+    
+__get()               //用于从无法访问的属性读取数据
+__set()               //用于将数据写入无法访问的属性
 __isset()             //在不可访问的属性上调用isset()或empty()触发
 __unset()             //在不可访问的属性上使用unset()时触发
-__invoke()            //当脚本尝试将对象调用为函数时触发
+    
+__invoke()            //将对象当作函数调用时触发
+__toString()		//把对象当作字符串使用时触发
 ```
 
+```php
+class Student {
+    private $name;
+    private $age;
+    private $address;
+    public function __toString()
+    {
+        return "__toString方法正在执行<br>";
+    }
+
+    public function __invoke()
+    {
+        echo "__invoke方法正在执行<br>";
+    }
+    
+    
+    public function __set($k, $v)
+    {
+        $this->$k = $v;
+        echo "__set方法正在执行<br>";
+    }
+
+    public function __get($k){
+        echo "__get方法正在执行<br>";
+        return $this->$k.'<br>';
+    }
+
+    public function __isset($k)
+    {
+        echo "__isset方法正在执行<br>";
+        return isset($this->$k);
+    }
+
+    public function __unset($k)
+    {
+        unset($this->$k);
+        echo "__unset方法正在执行<br>";
+    }
+
+}
+
+$stu = new Student;
+echo $stu;              // 把对象当作字符串使用时触发 __toString()
+$stu();                 // 把对象当作函数使用时触发 __invoke()
+$stu->name = 'harden';  // 将数据写入无法访问的属性时触发 __set()
+echo $stu->name;        // 访问无法访问的属性时触发 __get()
+var_dump(isset($stu->name));    //在不可访问的属性上调用isset()时触发 __isset()
+unset($stu->name);     // 在不可访问的属性上调用unset()时触发__unset()
+```
+
+![image-20210324161204147](https://gitee.com/f4ke/MarkDownImg/raw/master/static/20210324161205.png)
+
+```php
+class Student {
+    private $name;
+    public function __call($name, $arguments)
+    {
+        echo "{$name}方法不存在<br>";
+        echo "__call方法正在被执行<br>";
+    }
+
+    public static function __callStatic($name, $arguments)
+    {
+        echo "{$name}方法不存在<br>";
+        echo "__callStatic方法正在被执行<br>";
+    }
+}
+
+$stu = new Student;
+$stu->show();  // 调用无法访问的方法时触发__call()
+$stu::show();  // 调用无法访问的静态方法时触发__callStatic()
+```
+
+![image-20210324175253326](https://gitee.com/f4ke/MarkDownImg/raw/master/static/20210324175254.png)
 
 
-测试魔术方法触发顺序
+
+
+
+### 魔术方法触发顺序
 
 ```php
 <?php
